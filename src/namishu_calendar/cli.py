@@ -18,7 +18,6 @@ def main() -> None:
         "-o", "--output", default="calendar.pdf", metavar="PATH", help="output PDF (default: calendar.pdf)"
     )
     parser.add_argument("--config", metavar="PATH", help="YAML overrides for the built-in layout and font")
-    parser.add_argument("--font", metavar="PATH", help="TrueType font file (overrides the YAML font setting)")
     parser.add_argument("--version", action="version", version=f"%(prog)s {version('namishu-calendar')}")
     args = parser.parse_args()
 
@@ -27,7 +26,7 @@ def main() -> None:
     if args.month is not None and not 1 <= args.month <= 12:
         parser.error("--month must be between 1 and 12")
     try:
-        output = CalendarApp(config_path=args.config, font_path=args.font).generate(
+        output = CalendarApp(config_path=args.config).generate(
             output_path=args.output, year=args.year, month=args.month
         )
     except (ValueError, OSError) as exc:

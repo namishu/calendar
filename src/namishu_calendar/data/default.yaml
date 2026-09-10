@@ -59,4 +59,4 @@ day:
 
 # Font paths in custom configurations are relative to the YAML file.
 font:
-  path: fonts/NotoSans-Light.ttf
+  path: NotoSans-Light.ttf

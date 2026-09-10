@@ -23,8 +23,8 @@ def _load_yaml(path: Path) -> dict:
     return data
 
 
-def load_config(config_path: str | Path | None = None, *, font_path: str | Path | None = None) -> dict:
-    config = _load_yaml(DATA_DIR / "main.yaml")
+def load_config(config_path: str | Path | None = None) -> dict:
+    config = _load_yaml(DATA_DIR / "default.yaml")
     config["font"]["path"] = str(DATA_DIR / config["font"]["path"])
     if config_path is not None:
         path = Path(config_path).resolve()
@@ -41,8 +41,6 @@ def load_config(config_path: str | Path | None = None, *, font_path: str | Path 
         configured_font = config["font"]["path"]
         if isinstance(configured_font, str) and configured_font.strip():
             config["font"]["path"] = str(path.parent / configured_font)
-    if font_path is not None:
-        config["font"]["path"] = str(Path(font_path).resolve())
     validate_calendar_config(config)
     return config
 

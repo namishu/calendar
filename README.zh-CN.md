@@ -82,7 +82,6 @@ namishu-calendar --year 2027 --month 9 -o calendars/september.pdf
 | `--month MONTH` | 只生成指定月份，范围为 1–12 | 全年 12 个月 |
 | `-o, --output PATH` | PDF 保存路径 | `calendar.pdf` |
 | `--config PATH` | 用于覆盖版式或字体设置的 YAML 文件 | 内置设置 |
-| `--font PATH` | TrueType 字体文件，优先于 YAML 中的 `font.path` | 内置 Noto Sans Light |
 | `--help` | 显示使用说明 | |
 | `--version` | 显示已安装的版本 | |
 
@@ -125,14 +124,14 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 生成中文月历时，请在 YAML 中修改月份和星期名称，并指定支持中文的字体，
 例如 Noto Sans SC。
 
-可以直接使用 `--font` 选择字体文件，无需修改配置：
+使用自定义字体时，在 YAML 配置中添加字体路径即可：
 
-```bash
-namishu-calendar --year 2027 --month 9 --font fonts/MyFont.ttf
+```yaml
+font:
+  path: fonts/MyFont.ttf
 ```
 
-`--font` 的相对路径以当前工作目录为准，也可以使用绝对路径，
-其优先级高于 YAML 中的 `font.path`。YAML 字体路径仍以配置文件所在目录为准。
+字体路径相对于 YAML 文件所在目录，也可以使用绝对路径。
 字体会嵌入 PDF，接收文件的人无需安装该字体。
 设置无效、字体无法读取或缺少所需字符时，命令会报错。
 
@@ -140,7 +139,6 @@ namishu-calendar --year 2027 --month 9 --font fonts/MyFont.ttf
 
 代码和原创文档采用 [MIT 许可证](https://github.com/namishu/calendar/blob/main/LICENSE)。
 内置的 Noto Sans Light 字体采用
-[SIL Open Font License 1.1](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/fonts/OFL.txt)，
-其[说明文件](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/fonts/NOTICE.txt)
-记录了字体的版权归属和来源信息。
+[SIL Open Font License 1.1](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/OFL.txt)，
+同一文件中也记录了字体的版权归属和来源信息。
 生成的月历可以打印、分享、修改和销售。

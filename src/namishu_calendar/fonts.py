@@ -25,5 +25,5 @@ def validate_font_characters(font_name: str, text: str) -> None:
         codes = ", ".join(f"U+{ord(char):04X}" for char in missing[:8])
         raise ValueError(
             f"The selected font is missing characters ({codes}). "
-            "Choose a font that supports your labels with --font or font.path."
+            "Choose a font that supports your labels using font.path in your YAML configuration."
         )

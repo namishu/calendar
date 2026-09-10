@@ -13,8 +13,8 @@ from .renderer import MonthCalendarRenderer
 class CalendarApp:
     """Generate calendars using a snapshot of the defaults and optional overrides."""
 
-    def __init__(self, config_path: str | Path | None = None, *, font_path: str | Path | None = None):
-        self.config = load_config(config_path, font_path=font_path)
+    def __init__(self, config_path: str | Path | None = None):
+        self.config = load_config(config_path)
         self.font_name = register_configured_font(self.config["font"])
         validate_font_characters(
             self.font_name, "0123456789" + "".join(self.config["header"]["months"] + self.config["weekday"]["names"])

@@ -84,7 +84,6 @@ An existing PDF at the output path is replaced.
 | `--month MONTH` | Generate just this month, from 1 to 12 | All 12 months |
 | `-o, --output PATH` | PDF file location | `calendar.pdf` |
 | `--config PATH` | YAML file with layout or font overrides | Built-in settings |
-| `--font PATH` | TrueType font file; overrides `font.path` in YAML | Bundled Noto Sans Light |
 | `--help` | Show usage | |
 | `--version` | Show the installed version | |
 
@@ -127,15 +126,15 @@ Distances other than font sizes are in millimeters. Quote hex colors, such as
 it does not include Chinese characters. For Chinese calendars, change the month
 and weekday names in YAML and supply a font with Chinese glyphs, such as Noto Sans SC.
 
-Use `--font` to select a font file without editing your configuration:
+To use a custom font, add its path to your YAML configuration:
 
-```bash
-namishu-calendar --year 2027 --month 9 --font fonts/MyFont.ttf
+```yaml
+font:
+  path: fonts/MyFont.ttf
 ```
 
-The path passed to `--font` is relative to your current directory (or absolute),
-and takes precedence over `font.path` in YAML. YAML font paths remain relative to
-the configuration file. Fonts are embedded in the PDF, so recipients do not need
+Font paths are relative to the YAML file, or they can be absolute.
+Fonts are embedded in the PDF, so recipients do not need
 to install them. Invalid settings, unreadable fonts, or missing characters produce
 an error.
 
@@ -143,7 +142,6 @@ an error.
 
 Code and original documentation use the [MIT License](https://github.com/namishu/calendar/blob/main/LICENSE).
 The bundled Noto Sans Light font uses the
-[SIL Open Font License 1.1](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/fonts/OFL.txt);
-its [notice](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/fonts/NOTICE.txt)
-records the font's attribution and source information.
+[SIL Open Font License 1.1](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/OFL.txt).
+The same file includes the font's attribution and source information.
 Generated calendars may be printed, shared, modified, and sold.

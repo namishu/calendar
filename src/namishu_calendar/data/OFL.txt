@@ -1,3 +1,14 @@
+NotoSans-Light.ttf — Noto Sans Light
+Version: 2.008
+Copyright from the font's name table:
+Copyright 2015-2021 Google LLC. All Rights Reserved.
+License: SIL Open Font License 1.1; full license follows below.
+Source: https://github.com/notofonts/noto-fonts/blob/main/hinted/ttf/NotoSans/NotoSans-Light.ttf
+License source: https://github.com/notofonts/noto-fonts/blob/main/LICENSE
+
+This static TrueType font is distributed unchanged. It supports Latin text,
+including the default English calendar labels; it does not include Chinese glyphs.
+
 Copyright 2018 The Noto Project Authors (github.com/googlei18n/noto-fonts)
 
 This Font Software is licensed under the SIL Open Font License,

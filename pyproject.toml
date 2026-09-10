@@ -9,7 +9,7 @@ description = "Printable monthly calendars as A4 PDFs."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT AND OFL-1.1"
-license-files = ["LICENSE", "src/namishu_calendar/data/fonts/OFL.txt", "src/namishu_calendar/data/fonts/NOTICE.txt"]
+license-files = ["LICENSE", "src/namishu_calendar/data/OFL.txt"]
 authors = [{name = "Namishu"}]
 keywords = ["calendar", "pdf", "printable"]
 classifiers = [
@@ -34,7 +34,7 @@ dev = ["pytest>=8.0", "ruff>=0.11", "pypdf>=5.0"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-namishu_calendar = ["data/*.yaml", "data/fonts/*.ttf", "data/fonts/*.txt"]
+namishu_calendar = ["data/*.yaml", "data/*.ttf", "data/*.txt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -77,4 +77,3 @@ font: {}
 # font:
 #   path: fonts/custom.ttf
 # The path is relative to this YAML file, or it can be absolute.
-# You can also use --font PATH; it overrides font.path and resolves from the current directory.

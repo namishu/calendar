@@ -87,33 +87,26 @@ def test_help_and_version(tmp_path: Path) -> None:
         assert result.returncode == 0
         assert "namishu-calendar" in result.stdout
         assert "--count" not in result.stdout
+        assert "--font" not in result.stdout
     assert not (tmp_path / "calendar.pdf").exists()
 
 
-def test_cli_font_overrides_config_from_working_directory(tmp_path: Path) -> None:
+def test_yaml_custom_font_relative_to_config(tmp_path: Path) -> None:
     import shutil
 
     import reportlab
 
     font = Path(reportlab.__file__).parent / "fonts/Vera.ttf"
-    (tmp_path / "fonts").mkdir()
-    shutil.copyfile(font, tmp_path / "fonts/custom.ttf")
     settings = tmp_path / "settings"
     settings.mkdir()
-    (settings / "calendar.yaml").write_text("font:\n  path: missing.ttf\n")
-    result = run_cli(tmp_path, "--month", "9", "--config", "settings/calendar.yaml", "--font", "fonts/custom.ttf")
+    (settings / "fonts").mkdir()
+    shutil.copyfile(font, settings / "fonts/custom.ttf")
+    (settings / "calendar.yaml").write_text("font:\n  path: fonts/custom.ttf\n")
+    result = run_cli(tmp_path, "--month", "9", "--config", "settings/calendar.yaml")
     assert result.returncode == 0, result.stderr
     page = PdfReader(tmp_path / "calendar.pdf").pages[0]
     fonts = [font.get_object() for font in page["/Resources"]["/Font"].values()]
     assert any("BitstreamVeraSans" in font["/BaseFont"] for font in fonts)
-
-
-def test_cli_unreadable_font(tmp_path: Path) -> None:
-    result = run_cli(tmp_path, "--font", "missing.ttf")
-    assert result.returncode == 1
-    assert "Could not load font" in result.stderr
-    assert "Traceback" not in result.stderr
-    assert not (tmp_path / "calendar.pdf").exists()
 
 
 def test_chinese_labels_require_custom_font(tmp_path: Path) -> None:
@@ -123,6 +116,6 @@ def test_chinese_labels_require_custom_font(tmp_path: Path) -> None:
     result = run_cli(tmp_path, "--config", "chinese.yaml", "--month", "9")
     assert result.returncode == 1
     assert "missing characters" in result.stderr
-    assert "--font" in result.stderr
+    assert "font.path" in result.stderr
     assert "Traceback" not in result.stderr
     assert not (tmp_path / "calendar.pdf").exists()
