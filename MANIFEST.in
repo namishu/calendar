@@ -1,0 +1,4 @@
+include uv.lock
+recursive-include tests *.py
+recursive-include examples *.yaml *.pdf *.png
+global-exclude .DS_Store *.py[cod]

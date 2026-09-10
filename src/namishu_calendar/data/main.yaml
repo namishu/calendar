@@ -1,0 +1,62 @@
+layout:
+  # A4 landscape; layout distances are in millimeters, font sizes in points.
+  width: 297
+  height: 210
+  margin_top: 15
+  margin_bottom: 10
+  margin_left: 20
+  margin_right: 20
+
+header:
+  months:
+    - JANUARY
+    - FEBRUARY
+    - MARCH
+    - APRIL
+    - MAY
+    - JUNE
+    - JULY
+    - AUGUST
+    - SEPTEMBER
+    - OCTOBER
+    - NOVEMBER
+    - DECEMBER
+  size: 20
+  color: "#707a93"
+  padding_left: 0
+  padding_right: 0
+
+weekday:
+  first_day: 0
+  names:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+  size: 16
+  color: "#5c6478"
+  padding_top: 10
+  padding_bottom: 4
+
+cell:
+  padding: 2
+  hide_empty: 0.8
+  border_radius: 1
+  border_width: 0.3
+  border_color: "#5f667e"
+
+day:
+  size: 16
+  color: "#1f2c50"
+  align: LT
+  padding_top: 2
+  padding_bottom: 2
+  padding_left: 2
+  padding_right: 2
+
+# Font paths in custom configurations are relative to the YAML file.
+font:
+  path: fonts/NotoSansSC-Light.ttf

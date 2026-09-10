@@ -1,0 +1,90 @@
+import subprocess
+import sys
+from datetime import date
+from pathlib import Path
+
+import pytest
+from pypdf import PdfReader
+
+
+def run_cli(tmp_path: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, "-m", "namishu_calendar", *args], cwd=tmp_path, capture_output=True, text=True
+    )
+
+
+@pytest.mark.parametrize(
+    "args,pages,year",
+    [
+        ((), 12, None),
+        (("--year", "2027"), 12, 2027),
+        (("--month", "9"), 1, None),
+        (("--year", "2027", "--month", "9"), 1, 2027),
+    ],
+)
+def test_cli_defaults(tmp_path: Path, args: tuple, pages: int, year: int | None) -> None:
+    result = run_cli(tmp_path, *args)
+    assert result.returncode == 0, result.stderr
+    output = tmp_path / "calendar.pdf"
+    reader = PdfReader(output)
+    assert len(reader.pages) == pages
+    assert str(year or date.today().year) in reader.pages[0].extract_text()
+    assert str(output) in result.stdout
+    assert f"({pages} page" in result.stdout
+
+
+def test_output_and_overwrite(tmp_path: Path) -> None:
+    args = ("--month", "9", "-o", "nested/custom.pdf")
+    assert run_cli(tmp_path, *args).returncode == 0
+    assert run_cli(tmp_path, *args).returncode == 0
+    assert len(PdfReader(tmp_path / "nested/custom.pdf").pages) == 1
+
+
+@pytest.mark.parametrize("args", [("--month", "13"), ("--year", "10000"), ("--count", "2")])
+def test_invalid_arguments(tmp_path: Path, args: tuple) -> None:
+    result = run_cli(tmp_path, *args)
+    assert result.returncode == 2
+    assert "Traceback" not in result.stderr
+    assert not (tmp_path / "calendar.pdf").exists()
+
+
+@pytest.mark.parametrize(
+    "config,message",
+    [
+        ("[", "Invalid YAML"),
+        ("- item", "root must be a mapping"),
+        ("weekday:\n  first_day: 7", "weekday.first_day"),
+        ("weekday:\n  names: [Monday]", "weekday.names"),
+        ("header:\n  months: [1]", "header.months"),
+        ("day:\n  align: []", "day.align"),
+        ("day:\n  color: []", "day.color"),
+        ("layout:\n  width: .nan", "layout.width"),
+        ("layout:\n  margin_left: 500", "margins"),
+        ("font:\n  path: missing.ttf", "Could not load font"),
+        ("font:\n  path: null", "font.path"),
+        ("weekday:\n  firstday: 6", "Unknown configuration setting"),
+    ],
+)
+def test_config_errors(tmp_path: Path, config: str, message: str) -> None:
+    (tmp_path / "custom.yaml").write_text(config)
+    result = run_cli(tmp_path, "--config", "custom.yaml")
+    assert result.returncode == 1
+    assert message in result.stderr
+    assert "Traceback" not in result.stderr
+    assert not (tmp_path / "calendar.pdf").exists()
+
+
+def test_missing_config(tmp_path: Path) -> None:
+    result = run_cli(tmp_path, "--config", "missing.yaml")
+    assert result.returncode == 1
+    assert "missing.yaml" in result.stderr
+    assert "Traceback" not in result.stderr
+
+
+def test_help_and_version(tmp_path: Path) -> None:
+    for option in ("--help", "--version"):
+        result = run_cli(tmp_path, option)
+        assert result.returncode == 0
+        assert "namishu-calendar" in result.stdout
+        assert "--count" not in result.stdout
+    assert not (tmp_path / "calendar.pdf").exists()

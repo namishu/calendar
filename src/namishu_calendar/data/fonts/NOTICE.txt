@@ -1,0 +1,10 @@
+NotoSansSC-Light.ttf — Noto Sans SC Light
+Version: 2.004-H2;hotconv 1.0.118;makeotfexe 2.5.65603
+Copyright: (c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+License: SIL Open Font License 1.1; see OFL.txt in this directory.
+Upstream project: https://github.com/notofonts/noto-cjk
+Upstream license: https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE
+
+The version, copyright, and license above are recorded in the bundled font's
+name table. The font was carried over from Namishu's printables-python project.
+The original download URL was not recorded. The font file is distributed unchanged.
