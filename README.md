@@ -8,6 +8,8 @@
   <img src="https://img.shields.io/badge/PDF-A4_landscape-E05D44?style=flat" alt="PDF: A4 landscape">
 </p>
 
+<p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
+
 Namishu Calendar creates a clean monthly calendar with space for handwritten plans,
 appointments, and reminders. Generate a full year or a single month as a PDF,
 with one month per page. The default layout uses A4 landscape paper, English month
