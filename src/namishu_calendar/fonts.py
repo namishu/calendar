@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 from pathlib import Path
+from struct import unpack_from
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -27,3 +28,27 @@ def validate_font_characters(font_name: str, text: str) -> None:
             f"The selected font is missing characters ({codes}). "
             "Choose a font that supports your labels using 'font: path/to/font.ttf' in your YAML configuration."
         )
+
+
+class FontMetrics:
+    """Visible TrueType glyph bounds, in points relative to the text baseline."""
+
+    def __init__(self, font_name: str):
+        self.face = pdfmetrics.getFont(font_name).face
+        self.glyph_data = self.face.get_table("glyf")
+
+    def bounds(self, text: str, size: float) -> tuple[float, float, float, float]:
+        scale = size / self.face.unitsPerEm
+        advance = 0.0
+        boxes = []
+        for char in text:
+            code = ord(char)
+            glyph = self.face.charToGlyph[code]
+            start, end = self.face.glyphPos[glyph : glyph + 2]
+            if end > start:
+                left, bottom, right, top = unpack_from(">hhhh", self.glyph_data, start + 2)
+                boxes.append((advance + left * scale, bottom * scale, advance + right * scale, top * scale))
+            advance += self.face.charWidths[code] * size / 1000
+        if not boxes:
+            return 0.0, 0.0, advance, 0.0
+        return min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)

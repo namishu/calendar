@@ -53,18 +53,18 @@ def test_invalid_arguments(tmp_path: Path, args: tuple) -> None:
     [
         ("[", "Invalid YAML"),
         ("- item", "root must be a mapping"),
-        ("weekday:\n  first_day: 7", "weekday.first_day"),
-        ("weekday:\n  names: [Monday]", "weekday.names"),
-        ("header:\n  months: [1]", "header.months"),
-        ("day:\n  align: []", "day.align"),
-        ("day:\n  color: []", "day.color"),
-        ("layout:\n  width: .nan", "layout.width"),
-        ("layout:\n  margin_left: 500", "margins"),
+        ("weekdays:\n  week_start: invalid", "weekdays.week_start"),
+        ("weekdays:\n  names: [Monday]", "weekdays.names"),
+        ("title:\n  months: [1]", "title.months"),
+        ("day_numbers:\n  position: []", "day_numbers.position"),
+        ("day_numbers:\n  color: []", "day_numbers.color"),
+        ("page:\n  width: .nan", "page.width"),
+        ("page:\n  margin_left: 500", "margins"),
         ("font: missing.ttf", "Could not load font"),
         ("font: null", "Invalid font"),
         ("font: {}", "Invalid font"),
         ('font: ""', "Invalid font"),
-        ("weekday:\n  firstday: 6", "Unknown configuration setting"),
+        ("weekdays:\n  firstday: 6", "Unknown configuration setting"),
     ],
 )
 def test_config_errors(tmp_path: Path, config: str, message: str) -> None:
@@ -113,7 +113,7 @@ def test_yaml_custom_font_relative_to_config(tmp_path: Path) -> None:
 
 def test_chinese_labels_require_custom_font(tmp_path: Path) -> None:
     (tmp_path / "chinese.yaml").write_text(
-        "weekday:\n  names: [周一, 周二, 周三, 周四, 周五, 周六, 周日]\n", encoding="utf-8"
+        "weekdays:\n  names: [周一, 周二, 周三, 周四, 周五, 周六, 周日]\n", encoding="utf-8"
     )
     result = run_cli(tmp_path, "--config", "chinese.yaml", "--month", "9")
     assert result.returncode == 1

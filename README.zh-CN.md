@@ -91,9 +91,9 @@ namishu-calendar --year 2027 --month 9 -o calendars/september.pdf
 即可让每周从周日开始，并缩小左右边距：
 
 ```yaml
-weekday:
-  first_day: 6
-layout:
+weekdays:
+  week_start: sunday
+page:
   margin_left: 15
   margin_right: 15
 ```
@@ -109,17 +109,19 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 
 | 设置 | 修改方式 |
 |---|---|
-| 纸张与边距 | `layout`：尺寸和边距，单位为毫米 |
-| 月份名称 | `header.months`：按 1 月至 12 月排列的 12 个名称 |
-| 星期名称 | `weekday.names`：按周一至周日排列的 7 个名称 |
-| 每周起始日 | `weekday.first_day`：`0` 为周一，依次到 `6` 为周日 |
-| 文字 | `header`、`weekday` 和 `day` 中的 `size`（单位为磅）与 `color` |
-| 日期格 | `cell`：格间距、边框宽度、圆角半径和边框颜色 |
-| 空白格 | `cell.hide_empty`：`0` 为边框完全显示，`1` 为隐藏 |
-| 日期数字位置 | `day.align`：`LT` 左上、`RT` 右上、`LB` 左下、`RB` 右下、`C` 居中 |
+| 纸张与边距 | `page`：尺寸和边距，单位为毫米 |
+| 月份名称 | `title.months`：按 1 月至 12 月排列的 12 个名称 |
+| 星期名称 | `weekdays.names`：按周一至周日排列的 7 个名称 |
+| 每周起始日 | `weekdays.week_start`：`monday` 至 `sunday`，分别对应周一至周日 |
+| 文字 | `title`、`weekdays` 和 `day_numbers` 中的 `font_size`（单位为磅）与 `color` |
+| 日期格 | `grid`：格间距、边框宽度、圆角半径和边框颜色 |
+| 空白格 | `grid.empty_opacity`：`0` 为隐藏，`1` 为边框完全显示 |
+| 日期数字 | `day_numbers.position`：`top_left` 左上、`top_right` 右上、`bottom_left` 左下、`bottom_right` 右下、`center` 居中；`padding` 控制数字与边框内沿的距离 |
+| 垂直间距 | `title.gap_after` 和 `weekdays.gap_after`：每行文字下方的留白，从可见字形边界计算 |
 | 自定义字体 | `font`：TrueType 字体路径，可使用相对于 YAML 文件的路径或绝对路径 |
 
-除字号外，距离和尺寸的单位均为毫米。十六进制颜色值需加引号，例如 `"#5f667e"`。
+除字号外，距离和尺寸的单位均为毫米。日期数字居中时忽略 `padding`；
+网格间距从相邻边框的外沿计算。文字或日期格空间不足时，程序会在创建或覆盖 PDF 前报错。十六进制颜色值需加引号，例如 `"#5f667e"`。
 内置的 Noto Sans Light 字体支持默认英文标签，不包含中文字形。
 生成中文月历时，请在 YAML 中修改月份和星期名称，并指定支持中文的字体，
 例如 Noto Sans SC。

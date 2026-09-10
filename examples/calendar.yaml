@@ -2,17 +2,18 @@
 # Use: namishu-calendar --year 2027 --month 9 --config calendar.yaml
 # All distances are in millimeters; font sizes are in points.
 
-# Paper and margins (A4 landscape)
-layout:
+# Paper and margins (A4 landscape).
+# Margins extend to the visible title and the outside edges of the grid.
+page:
   width: 297
   height: 210
-  margin_top: 15
+  margin_top: 10
   margin_bottom: 10
   margin_left: 20
   margin_right: 20
 
-# Month heading
-header:
+# Month and year title, aligned with the left and right edges of the grid.
+title:
   # January through December; names can be translated.
   months:
     - JANUARY
@@ -27,16 +28,15 @@ header:
     - OCTOBER
     - NOVEMBER
     - DECEMBER
-  size: 20
+  font_size: 20
   color: "#707a93"
-  padding_left: 0
-  padding_right: 0
+  # Clear space between the title's bottom edge and the weekday row's top edge.
+  gap_after: 4
 
-# Weekday heading
-weekday:
-  # 0 = Monday, ..., 6 = Sunday
-  first_day: 0
-  # Always list Monday through Sunday, regardless of first_day.
+weekdays:
+  # monday, tuesday, wednesday, thursday, friday, saturday, or sunday.
+  week_start: monday
+  # Always list Monday through Sunday, regardless of week_start.
   names:
     - Monday
     - Tuesday
@@ -45,30 +45,27 @@ weekday:
     - Friday
     - Saturday
     - Sunday
-  size: 16
+  font_size: 16
   color: "#5c6478"
-  padding_top: 10
-  padding_bottom: 4
+  # Clear space between weekday text and the top of the grid.
+  gap_after: 2
 
-# Day boxes
-cell:
-  padding: 2
-  # Empty box borders: 0 = fully visible, 1 = invisible.
-  hide_empty: 0.8
+grid:
+  # Space between the outside edges of adjacent cell borders.
+  gap: 2
+  # Empty cell borders: 0 = invisible, 1 = fully visible.
+  empty_opacity: 0.2
   border_radius: 1
   border_width: 0.3
   border_color: "#5f667e"
 
-# Day numbers
-day:
-  size: 16
+day_numbers:
+  font_size: 16
   color: "#1f2c50"
-  # LT / RT / LB / RB / C = top left / top right / bottom left / bottom right / center
-  align: LT
-  padding_top: 2
-  padding_bottom: 2
-  padding_left: 2
-  padding_right: 2
+  # top_left, top_right, bottom_left, bottom_right, or center.
+  position: top_left
+  # Inset from the inside edge of the border; ignored for center.
+  padding: 2
 
 # Optional custom TrueType font; omit to use the bundled Noto Sans Light.
 # The bundled font supports English; choose a Chinese font for Chinese labels.

@@ -48,57 +48,54 @@ def load_config(config_path: str | Path | None = None) -> dict:
     return config
 
 
+WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+POSITIONS = ("top_left", "top_right", "bottom_left", "bottom_right", "center")
+
+
 def validate_calendar_config(config: dict[str, Any]) -> None:
-    layout = _section(config, "layout")
-    _positive_number(layout, "width", "layout")
-    _positive_number(layout, "height", "layout")
+    page = _section(config, "page")
+    for key in ("width", "height"):
+        _positive_number(page, key, "page")
     for key in ("margin_top", "margin_bottom", "margin_left", "margin_right"):
-        _non_negative_number(layout, key, "layout")
-    if layout["margin_left"] + layout["margin_right"] >= layout["width"]:
-        raise ValueError("Invalid layout: horizontal margins leave no drawable width")
-    if layout["margin_top"] + layout["margin_bottom"] >= layout["height"]:
-        raise ValueError("Invalid layout: vertical margins leave no drawable height")
+        _non_negative_number(page, key, "page")
+    if page["margin_left"] + page["margin_right"] >= page["width"]:
+        raise ValueError("Invalid page: horizontal margins leave no drawable width")
+    if page["margin_top"] + page["margin_bottom"] >= page["height"]:
+        raise ValueError("Invalid page: vertical margins leave no drawable height")
 
-    header = _section(config, "header")
-    months = header.get("months")
-    if not isinstance(months, list) or len(months) != 12 or not all(isinstance(x, str) and x.strip() for x in months):
-        raise ValueError("Invalid header.months: expected 12 non-empty names")
-    _positive_number(header, "size", "header")
-    for key in ("padding_left", "padding_right"):
-        _non_negative_number(header, key, "header")
+    title = _section(config, "title")
+    weekdays = _section(config, "weekdays")
+    for section, key, count in (("title", "months", 12), ("weekdays", "names", 7)):
+        names = config[section].get(key)
+        if (
+            not isinstance(names, list)
+            or len(names) != count
+            or not all(
+                isinstance(name, str) and name.strip() and not any(c in name for c in "\n\r\t") for name in names
+            )
+        ):
+            raise ValueError(f"Invalid {section}.{key}: expected {count} non-empty, single-line names")
+    if weekdays.get("week_start") not in WEEKDAYS:
+        raise ValueError("Invalid weekdays.week_start: expected monday through sunday")
+    for section, values in (("title", title), ("weekdays", weekdays)):
+        _positive_number(values, "font_size", section)
+        _non_negative_number(values, "gap_after", section)
 
-    weekday = _section(config, "weekday")
-    weekdays = weekday.get("names")
-    if (
-        not isinstance(weekdays, list)
-        or len(weekdays) != 7
-        or not all(isinstance(x, str) and x.strip() for x in weekdays)
-    ):
-        raise ValueError("Invalid weekday.names: expected 7 non-empty names")
-    first_day = weekday.get("first_day")
-    if type(first_day) is not int or not (0 <= first_day <= 6):
-        raise ValueError(f"Invalid weekday.first_day: {first_day}")
-    _positive_number(weekday, "size", "weekday")
-    for key in ("padding_top", "padding_bottom"):
-        _non_negative_number(weekday, key, "weekday")
+    grid = _section(config, "grid")
+    for key in ("gap", "border_radius"):
+        _non_negative_number(grid, key, "grid")
+    _positive_number(grid, "border_width", "grid")
+    opacity = grid.get("empty_opacity")
+    if type(opacity) not in (int, float) or not 0 <= opacity <= 1:
+        raise ValueError("Invalid grid.empty_opacity: expected a number between 0 and 1")
 
-    cell = _section(config, "cell")
-    _non_negative_number(cell, "padding", "cell")
-    _non_negative_number(cell, "border_radius", "cell")
-    _positive_number(cell, "border_width", "cell")
-    hide_empty = cell.get("hide_empty")
-    if type(hide_empty) not in (int, float) or not (0 <= hide_empty <= 1):
-        raise ValueError(f"Invalid cell.hide_empty: {hide_empty}")
+    day = _section(config, "day_numbers")
+    _positive_number(day, "font_size", "day_numbers")
+    _non_negative_number(day, "padding", "day_numbers")
+    if day.get("position") not in POSITIONS:
+        raise ValueError(f"Invalid day_numbers.position: expected one of {', '.join(POSITIONS)}")
 
-    day = _section(config, "day")
-    _positive_number(day, "size", "day")
-    align = day.get("align")
-    if not isinstance(align, str) or align not in {"LT", "RT", "LB", "RB", "C"}:
-        raise ValueError(f"Invalid day.align: {align}")
-    for key in ("padding_top", "padding_bottom", "padding_left", "padding_right"):
-        _non_negative_number(day, key, "day")
-
-    for section, key in (("header", "color"), ("weekday", "color"), ("day", "color"), ("cell", "border_color")):
+    for section, key in (("title", "color"), ("weekdays", "color"), ("day_numbers", "color"), ("grid", "border_color")):
         value = config[section][key]
         try:
             if not isinstance(value, str):

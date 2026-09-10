@@ -93,9 +93,9 @@ Write only the settings you want to change. Save this as `calendar.yaml` to star
 weeks on Sunday and use narrower side margins:
 
 ```yaml
-weekday:
-  first_day: 6
-layout:
+weekdays:
+  week_start: sunday
+page:
   margin_left: 15
   margin_right: 15
 ```
@@ -111,17 +111,21 @@ edit it and pass its local path to `--config`.
 
 | Setting | How to customize it |
 |---|---|
-| Paper and margins | `layout`: dimensions and margins in millimeters |
-| Month labels | `header.months`: 12 names, January through December |
-| Weekday labels | `weekday.names`: 7 names, Monday through Sunday |
-| First weekday | `weekday.first_day`: `0` for Monday through `6` for Sunday |
-| Text | `size` in points and `color`, for `header`, `weekday`, and `day` |
-| Day boxes | `cell`: spacing, border width, radius, and border color |
-| Empty boxes | `cell.hide_empty`: `0` for a full border, `1` for invisible |
-| Day number position | `day.align`: `LT`, `RT`, `LB`, `RB`, or `C` for the corners or center |
+| Paper and margins | `page`: dimensions and margins in millimeters |
+| Month labels | `title.months`: 12 names, January through December |
+| Weekday labels | `weekdays.names`: 7 names, Monday through Sunday |
+| First weekday | `weekdays.week_start`: `monday` through `sunday` |
+| Text | `font_size` in points and `color`, for `title`, `weekdays`, and `day_numbers` |
+| Day boxes | `grid`: spacing, border width, radius, and border color |
+| Empty boxes | `grid.empty_opacity`: `0` for invisible, `1` for a full border |
+| Day numbers | `day_numbers.position`: `top_left`, `top_right`, `bottom_left`, `bottom_right`, or `center`; `padding` sets the inset from the inside edge of each border |
+| Vertical spacing | `title.gap_after` and `weekdays.gap_after`: space below each text row, measured from visible glyph bounds |
 | Custom font | `font`: a TrueType font path, relative to the YAML file or absolute |
 
-Distances other than font sizes are in millimeters. Quote hex colors, such as
+Distances other than font sizes are in millimeters. Day-number padding is ignored
+when centered. Grid gaps are measured between the outside edges of borders.
+Layouts that leave insufficient room for text or cells produce an error before
+the output file is created or replaced. Quote hex colors, such as
 `"#5f667e"`. The bundled Noto Sans Light font supports the default English labels;
 it does not include Chinese characters. For Chinese calendars, change the month
 and weekday names in YAML and supply a font with Chinese glyphs, such as Noto Sans SC.

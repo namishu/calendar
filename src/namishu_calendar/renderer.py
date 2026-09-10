@@ -1,212 +1,122 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from reportlab.lib.units import mm
-from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 
+from .fonts import FontMetrics
 from .instance import MonthCalendarInstance
+
+
+@dataclass(frozen=True)
+class MonthLayout:
+    left: float
+    right: float
+    title_baseline: float
+    weekdays_baseline: float
+    grid_top: float
+    cell_width: float
+    cell_height: float
 
 
 class MonthCalendarRenderer:
     def __init__(self, config: dict, font_name: str):
         self.config = config
         self.font_name = font_name
+        self.metrics = FontMetrics(font_name)
 
-    def draw_month(self, pdf: canvas.Canvas, month_data: MonthCalendarInstance) -> None:
-        y0 = self._draw_header(pdf, month_data)
-        y1 = self._draw_weekdays(pdf, month_data, y0)
-        self._draw_cells(pdf, month_data, y1)
-        self._draw_days(pdf, month_data, y1)
-
-    def _draw_header(self, pdf: canvas.Canvas, month_data: MonthCalendarInstance) -> float:
-        cfg = self.config
-        header = cfg["header"]
-        layout = cfg["layout"]
-
-        font_size = header["size"]
-        pdf.setFont(self.font_name, font_size)
-        self._set_fill(pdf, header["color"])
-
-        paper_height = self._mm_to_pt(layout["height"])
-        paper_width = self._mm_to_pt(layout["width"])
-        margin_top = self._mm_to_pt(layout["margin_top"])
-        margin_left = self._mm_to_pt(layout["margin_left"])
-        margin_right = self._mm_to_pt(layout["margin_right"])
-
-        x = margin_left + self._mm_to_pt(header["padding_left"])
-        y = paper_height - margin_top
-        pdf.drawString(x, y, month_data.month_text())
-
-        year_text = str(month_data.year)
-        year_width = pdf.stringWidth(year_text, self.font_name, font_size)
-        x = paper_width - margin_right - year_width - self._mm_to_pt(header["padding_right"])
-        pdf.drawString(x, y, year_text)
-
-        self._reset_color(pdf)
-        return y
-
-    def _draw_weekdays(self, pdf: canvas.Canvas, month_data: MonthCalendarInstance, y0: float) -> float:
-        cfg = self.config
-        weekday_cfg = cfg["weekday"]
-        font_size = weekday_cfg["size"]
-        pdf.setFont(self.font_name, font_size)
-        self._set_fill(pdf, weekday_cfg["color"])
-
-        y = y0 - self._mm_to_pt(weekday_cfg["padding_top"])
-        x0 = self._mm_to_pt(cfg["layout"]["margin_left"])
-        padding = self._mm_to_pt(cfg["cell"]["padding"])
-        cell_width, _ = self._cell_size(month_data, y)
-        weekdays = month_data.weekday_texts()
-        for i in range(7):
-            text_width = pdf.stringWidth(weekdays[i], self.font_name, font_size)
-            x = x0 + (cell_width + padding) * i + (cell_width - text_width) / 2
-            pdf.drawString(x, y, weekdays[i])
-
-        y -= self._mm_to_pt(weekday_cfg["padding_bottom"])
-        self._reset_color(pdf)
-        return y
-
-    def _draw_cells(self, pdf: canvas.Canvas, month_data: MonthCalendarInstance, y0: float) -> None:
-        rows = month_data.weeks_across()
-        cols = 7
-        cell_width, cell_height = self._cell_size(month_data, y0)
-        matrix = month_data.day_matrix()
-        for i in range(rows):
-            for j in range(cols):
-                x, y = self._cell_pos(y0, i + 1, j + 1, month_data)
-                self._draw_single_cell(pdf, matrix[i][j], x, y, cell_width, cell_height)
-        self._reset_color(pdf)
-
-    def _draw_days(self, pdf: canvas.Canvas, month_data: MonthCalendarInstance, y0: float) -> None:
-        cfg = self.config
-        day_cfg = cfg["day"]
-        font_size = day_cfg["size"]
-        pdf.setFont(self.font_name, font_size)
-        self._set_fill(pdf, day_cfg["color"])
-
-        rows = month_data.weeks_across()
-        cols = 7
-        cell_width, cell_height = self._cell_size(month_data, y0)
-        matrix = month_data.day_matrix()
-
-        for i in range(rows):
-            for j in range(cols):
-                day = matrix[i][j]
-                if day == 0:
-                    continue
-                x, y = self._cell_pos(y0, i + 1, j + 1, month_data)
-                tx, ty = self._align_day(x, y, day, font_size, cell_width, cell_height)
-                pdf.drawString(tx, ty, str(day))
-
-        self._reset_color(pdf)
-
-    def _draw_single_cell(
-        self,
-        pdf: canvas.Canvas,
-        day: int,
-        x: float,
-        y: float,
-        cell_width: float,
-        cell_height: float,
-    ) -> None:
-        cfg = self.config["cell"]
-        opacity = 1.0 if day != 0 else 1.0 - cfg["hide_empty"]
-        self._set_stroke(
-            pdf,
-            width=self._mm_to_pt(cfg["border_width"]),
-            color=cfg["border_color"],
-            opacity=opacity,
+    def layout(self, month: MonthCalendarInstance) -> MonthLayout:
+        page, title, weekdays, grid, numbers = (
+            self.config[key] for key in ("page", "title", "weekdays", "grid", "day_numbers")
         )
-        radius = self._mm_to_pt(cfg["border_radius"])
-        pdf.roundRect(x, y, cell_width, cell_height, radius)
+        left = page["margin_left"] * mm
+        right = (page["width"] - page["margin_right"]) * mm
+        width = right - left
+        top = (page["height"] - page["margin_top"]) * mm
+        bottom = page["margin_bottom"] * mm
+        title_bounds = [self.metrics.bounds(text, title["font_size"]) for text in (month.month_text(), str(month.year))]
+        if sum(b[2] - b[0] for b in title_bounds) >= width:
+            raise ValueError("Title does not fit: reduce title.font_size or increase the usable page width")
+        title_baseline = top - max(b[3] for b in title_bounds)
+        title_bottom = title_baseline + min(b[1] for b in title_bounds)
+        weekday_bounds = [self.metrics.bounds(text, weekdays["font_size"]) for text in month.weekday_texts()]
+        weekdays_baseline = title_bottom - title["gap_after"] * mm - max(b[3] for b in weekday_bounds)
+        grid_top = weekdays_baseline + min(b[1] for b in weekday_bounds) - weekdays["gap_after"] * mm
+        gap = grid["gap"] * mm
+        rows = month.weeks_across()
+        cell_width = (width - 6 * gap) / 7
+        cell_height = (grid_top - bottom - (rows - 1) * gap) / rows
+        if cell_width <= 0 or cell_height <= 0:
+            raise ValueError(
+                f"No space for the calendar grid in {month.year}-{month.month:02d}: "
+                "check page dimensions, margins, gap_after, font sizes, and grid.gap"
+            )
+        stroke = grid["border_width"] * mm
+        if stroke >= min(cell_width, cell_height):
+            raise ValueError("grid.border_width is too large for the calendar cells")
+        if grid["border_radius"] * mm > (min(cell_width, cell_height) - stroke) / 2:
+            raise ValueError("grid.border_radius is too large for the calendar cells")
+        if any(b[2] - b[0] > cell_width for b in weekday_bounds):
+            raise ValueError("Weekday names do not fit: shorten weekdays.names or reduce weekdays.font_size")
+        inset = stroke + (0 if numbers["position"] == "center" else numbers["padding"] * mm)
+        for day in (day for week in month.day_matrix() for day in week if day):
+            x0, y0, x1, y1 = self.metrics.bounds(str(day), numbers["font_size"])
+            if x1 - x0 > cell_width - 2 * inset or y1 - y0 > cell_height - 2 * inset:
+                raise ValueError(
+                    f"Day numbers do not fit in {month.year}-{month.month:02d}: "
+                    "reduce day_numbers.font_size or padding, or increase the usable grid area"
+                )
+        return MonthLayout(left, right, title_baseline, weekdays_baseline, grid_top, cell_width, cell_height)
 
-    def _cell_size(self, month_data: MonthCalendarInstance, y0: float) -> tuple[float, float]:
-        cfg = self.config
-        paper_width = self._mm_to_pt(cfg["layout"]["width"])
-        margin_left = self._mm_to_pt(cfg["layout"]["margin_left"])
-        margin_right = self._mm_to_pt(cfg["layout"]["margin_right"])
-        margin_bottom = self._mm_to_pt(cfg["layout"]["margin_bottom"])
-        padding = self._mm_to_pt(cfg["cell"]["padding"])
+    def draw_month(self, pdf: canvas.Canvas, month: MonthCalendarInstance, layout: MonthLayout) -> None:
+        title, weekdays, grid, numbers = (self.config[key] for key in ("title", "weekdays", "grid", "day_numbers"))
+        pdf.saveState()
+        pdf.setFont(self.font_name, title["font_size"])
+        pdf.setFillColor(title["color"])
+        month_bounds = self.metrics.bounds(month.month_text(), title["font_size"])
+        year_bounds = self.metrics.bounds(str(month.year), title["font_size"])
+        pdf.drawString(layout.left - month_bounds[0], layout.title_baseline, month.month_text())
+        pdf.drawString(layout.right - year_bounds[2], layout.title_baseline, str(month.year))
 
-        columns = 7
-        rows = month_data.weeks_across()
-        width = (paper_width - margin_left - margin_right - padding * (columns - 1)) / columns
-        height = (y0 - margin_bottom - padding * (rows - 1)) / rows
-        return width, height
+        gap = grid["gap"] * mm
+        pdf.setFont(self.font_name, weekdays["font_size"])
+        pdf.setFillColor(weekdays["color"])
+        for column, text in enumerate(month.weekday_texts()):
+            bounds = self.metrics.bounds(text, weekdays["font_size"])
+            center = layout.left + column * (layout.cell_width + gap) + layout.cell_width / 2
+            pdf.drawString(center - (bounds[0] + bounds[2]) / 2, layout.weekdays_baseline, text)
 
-    def _cell_pos(
-        self,
-        y0: float,
-        row: int,
-        col: int,
-        month_data: MonthCalendarInstance,
-    ) -> tuple[float, float]:
-        margin_left = self._mm_to_pt(self.config["layout"]["margin_left"])
-        width, height = self._cell_size(month_data, y0)
-        padding = self._mm_to_pt(self.config["cell"]["padding"])
+        stroke = grid["border_width"] * mm
+        pdf.setLineWidth(stroke)
+        pdf.setFont(self.font_name, numbers["font_size"])
+        pdf.setFillColor(numbers["color"])
+        for row, week in enumerate(month.day_matrix()):
+            for column, day in enumerate(week):
+                x = layout.left + column * (layout.cell_width + gap)
+                y = layout.grid_top - (row + 1) * layout.cell_height - row * gap
+                opacity = 1 if day else grid["empty_opacity"]
+                if opacity:
+                    pdf.setStrokeColor(grid["border_color"], alpha=opacity)
+                    pdf.roundRect(
+                        x + stroke / 2,
+                        y + stroke / 2,
+                        layout.cell_width - stroke,
+                        layout.cell_height - stroke,
+                        grid["border_radius"] * mm,
+                    )
+                if day:
+                    tx, ty = self._number_position(str(day), x, y, layout)
+                    pdf.drawString(tx, ty, str(day))
+        pdf.restoreState()
 
-        x = margin_left + (col - 1) * (width + padding)
-        y = y0 - row * height - padding * (row - 1)
-        return x, y
-
-    def _align_day(
-        self,
-        x: float,
-        y: float,
-        day: int,
-        font_size: float,
-        cell_width: float,
-        cell_height: float,
-    ) -> tuple[float, float]:
-        cfg = self.config["day"]
-        padding_left = self._mm_to_pt(cfg["padding_left"])
-        padding_bottom = self._mm_to_pt(cfg["padding_bottom"])
-        padding_right = self._mm_to_pt(cfg["padding_right"])
-        padding_top = self._mm_to_pt(cfg["padding_top"])
-
-        text_width = self._text_width(str(day), font_size)
-        text_height = font_size / 1.2
-        align = cfg["align"]
-
-        if align == "LT":
-            x += padding_left
-            y += cell_height - padding_top - text_height
-        elif align == "RT":
-            x += cell_width - padding_right - text_width
-            y += cell_height - padding_top - text_height
-        elif align == "LB":
-            x += padding_left
-            y += padding_bottom
-        elif align == "RB":
-            x += cell_width - padding_right - text_width
-            y += padding_bottom
-        elif align == "C":
-            x += (cell_width - text_width) / 2
-            y += (cell_height - text_height) / 2
-
-        return x, y
-
-    def _set_fill(self, pdf: canvas.Canvas, color: str, opacity: float | None = None) -> None:
-        pdf.setFillColor(color, opacity)
-
-    def _set_stroke(
-        self,
-        pdf: canvas.Canvas,
-        width: float | None = None,
-        color: str | None = None,
-        opacity: float | None = None,
-    ) -> None:
-        if width is not None:
-            pdf.setLineWidth(width)
-        if color is not None:
-            pdf.setStrokeColor(color, opacity)
-
-    def _reset_color(self, pdf: canvas.Canvas) -> None:
-        pdf.setFillColor("black")
-        pdf.setStrokeColor("black")
-
-    def _text_width(self, text: str, font_size: float) -> float:
-        return pdfmetrics.stringWidth(text, self.font_name, font_size)
-
-    def _mm_to_pt(self, value: float) -> float:
-        return value * mm
+    def _number_position(self, text: str, x: float, y: float, layout: MonthLayout) -> tuple[float, float]:
+        numbers = self.config["day_numbers"]
+        x0, y0, x1, y1 = self.metrics.bounds(text, numbers["font_size"])
+        position = numbers["position"]
+        if position == "center":
+            return x + (layout.cell_width - x0 - x1) / 2, y + (layout.cell_height - y0 - y1) / 2
+        inset = (self.config["grid"]["border_width"] + numbers["padding"]) * mm
+        tx = x + inset - x0 if position.endswith("left") else x + layout.cell_width - inset - x1
+        ty = y + layout.cell_height - inset - y1 if position.startswith("top") else y + inset - y0
+        return tx, ty
