@@ -14,7 +14,12 @@ from tempfile import TemporaryDirectory
 def main() -> None:
     parser = argparse.ArgumentParser(description="Verify release artifacts without publishing them.")
     parser.add_argument("--offline", action="store_true", help="use only cached build and test dependencies")
+    parser.add_argument("--dist-dir", type=Path, help="retain verified distributions in an empty directory")
     args = parser.parse_args()
+    if args.dist_dir is not None:
+        args.dist_dir = args.dist_dir.resolve()
+        if args.dist_dir.exists() and (not args.dist_dir.is_dir() or any(args.dist_dir.iterdir())):
+            parser.error("--dist-dir must be absent or an empty directory")
     uv = shutil.which("uv")
     if uv is None:
         parser.error("uv must be installed and available on PATH")
@@ -55,6 +60,10 @@ def main() -> None:
             cwd=check,
         )
         run(python, "-m", "pytest", "-q", "tests", cwd=check)
+        if args.dist_dir is not None:
+            args.dist_dir.mkdir(parents=True, exist_ok=True)
+            for artifact in dist.iterdir():
+                shutil.copyfile(artifact, args.dist_dir / artifact.name)
     print("Release verification passed: sdist, wheel, installed command, and isolated test suite.")
 
 
