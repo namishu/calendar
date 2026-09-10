@@ -3,10 +3,12 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+
 from .config import WEEKDAYS, load_config
 from .fonts import register_configured_font, validate_font_characters
-from .instance import MonthCalendarInstance
-from .pdf import create_canvas
+from .month import CalendarMonth
 from .renderer import MonthCalendarRenderer
 
 
@@ -35,7 +37,7 @@ class CalendarApp:
             raise ValueError("Invalid month: expected an integer between 1 and 12")
 
         months = [
-            MonthCalendarInstance(
+            CalendarMonth(
                 year=year,
                 month=current_month,
                 months=self.config["title"]["months"],
@@ -50,7 +52,11 @@ class CalendarApp:
         output.parent.mkdir(parents=True, exist_ok=True)
         page = self.config["page"]
         title = f"Calendar {year}" if month is None else f"Calendar {year}-{month:02d}"
-        pdf = create_canvas(output, width_mm=page["width"], height_mm=page["height"], title=title)
+        pdf = canvas.Canvas(str(output), pagesize=(page["width"] * mm, page["height"] * mm))
+        pdf.setTitle(title)
+        pdf.setAuthor("Namishu")
+        pdf.setSubject("Printable monthly calendar")
+        pdf.setCreator("Namishu Calendar")
         for item, layout in zip(months, layouts, strict=True):
             self.renderer.draw_month(pdf, item, layout)
             pdf.showPage()

@@ -114,6 +114,10 @@ def test_empty_cell_visibility(tmp_path: Path, opacity: float, borders: int) -> 
         ({"grid": {"empty_opacity": 2}}, "grid.empty_opacity"),
         ({"weekdays": {"week_start": 0}}, "weekdays.week_start"),
         ({"day_numbers": {"position": "LT"}}, "day_numbers.position"),
+        *[
+            ({"grid": {"border_radius": 10}, "day_numbers": {"padding": 0, "position": position}}, "rounded corners")
+            for position in ("top_left", "top_right", "bottom_left", "bottom_right")
+        ],
     ],
 )
 def test_invalid_layout_preserves_existing_file(tmp_path: Path, overrides: dict, message: str) -> None:
@@ -137,3 +141,14 @@ def test_full_year_validates_later_months_before_writing(tmp_path: Path) -> None
     with pytest.raises(ValueError, match="Title does not fit"):
         app.generate(output, year=2027)
     assert not output.parent.exists()
+
+
+@pytest.mark.parametrize(
+    "position,padding", [("top_left", 4), ("top_right", 4), ("bottom_left", 4), ("bottom_right", 4), ("center", 0)]
+)
+def test_large_radius_with_sufficient_clearance(tmp_path: Path, position: str, padding: int) -> None:
+    _, reader = _render(
+        tmp_path, {"grid": {"border_radius": 10}, "day_numbers": {"padding": padding, "position": position}}
+    )
+    assert len(reader.pages) == 1
+    assert "30" in reader.pages[0].extract_text().splitlines()

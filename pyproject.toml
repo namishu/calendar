@@ -28,7 +28,7 @@ Issues = "https://github.com/namishu/calendar/issues"
 namishu-calendar = "namishu_calendar.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.0", "ruff>=0.11", "pypdf>=5.0"]
+dev = ["pytest>=8.0", "ruff>=0.11", "pypdf>=5.0", "fonttools>=4.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

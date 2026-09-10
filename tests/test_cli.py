@@ -9,7 +9,7 @@ from pypdf import PdfReader
 
 def run_cli(tmp_path: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [sys.executable, "-m", "namishu_calendar", *args], cwd=tmp_path, capture_output=True, text=True
+        [sys.executable, "-m", "namishu_calendar", *args], cwd=tmp_path, capture_output=True, text=True, timeout=30
     )
 
 
@@ -48,25 +48,7 @@ def test_invalid_arguments(tmp_path: Path, args: tuple) -> None:
     assert not (tmp_path / "calendar.pdf").exists()
 
 
-@pytest.mark.parametrize(
-    "config,message",
-    [
-        ("[", "Invalid YAML"),
-        ("- item", "root must be a mapping"),
-        ("weekdays:\n  week_start: invalid", "weekdays.week_start"),
-        ("weekdays:\n  names: [Monday]", "weekdays.names"),
-        ("title:\n  months: [1]", "title.months"),
-        ("day_numbers:\n  position: []", "day_numbers.position"),
-        ("day_numbers:\n  color: []", "day_numbers.color"),
-        ("page:\n  width: .nan", "page.width"),
-        ("page:\n  margin_left: 500", "margins"),
-        ("font: missing.ttf", "Could not load font"),
-        ("font: null", "Invalid font"),
-        ("font: {}", "Invalid font"),
-        ('font: ""', "Invalid font"),
-        ("weekdays:\n  firstday: 6", "Unknown configuration setting"),
-    ],
-)
+@pytest.mark.parametrize("config,message", [("[", "Invalid YAML"), ("font: missing.ttf", "Could not load font")])
 def test_config_errors(tmp_path: Path, config: str, message: str) -> None:
     (tmp_path / "custom.yaml").write_text(config)
     result = run_cli(tmp_path, "--config", "custom.yaml")

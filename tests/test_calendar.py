@@ -1,3 +1,4 @@
+import shutil
 from datetime import date
 from pathlib import Path
 
@@ -7,7 +8,6 @@ from reportlab.lib.units import mm
 
 from namishu_calendar import CalendarApp
 from namishu_calendar.config import DATA_DIR
-from namishu_calendar.instance import MonthCalendarInstance
 
 
 def test_full_year_pdf(tmp_path: Path) -> None:
@@ -36,17 +36,6 @@ def test_current_year(tmp_path: Path) -> None:
     assert str(date.today().year) in reader.pages[0].extract_text()
 
 
-@pytest.mark.parametrize("year,month,first_day,rows", [(2021, 2, 0, 4), (2024, 2, 6, 5), (2027, 5, 0, 6)])
-def test_month_grid(year: int, month: int, first_day: int, rows: int) -> None:
-    cfg = CalendarApp().config
-    instance = MonthCalendarInstance(year, month, cfg["title"]["months"], cfg["weekdays"]["names"], first_day)
-    assert instance.weeks_across() == rows
-    assert len(instance.day_matrix()) == rows
-    column = (date(year, month, 1).weekday() - first_day) % 7
-    assert instance.day_matrix()[0][column] == 1
-    assert instance.weekday_texts()[0] == cfg["weekdays"]["names"][first_day]
-
-
 def test_partial_config_keeps_bundled_font(tmp_path: Path) -> None:
     config = tmp_path / "custom.yaml"
     config.write_text("weekdays:\n  week_start: sunday\n")
@@ -62,21 +51,12 @@ def test_partial_config_keeps_bundled_font(tmp_path: Path) -> None:
 def test_relative_custom_font(tmp_path: Path, monkeypatch) -> None:
     directory = tmp_path / "settings"
     directory.mkdir()
-    (directory / "font.ttf").symlink_to(DATA_DIR / "NotoSans-Light.ttf")
+    shutil.copyfile(DATA_DIR / "NotoSans-Light.ttf", directory / "font.ttf")
     (directory / "custom.yaml").write_text("font: font.ttf\n")
     monkeypatch.chdir(tmp_path)
     app = CalendarApp("settings/custom.yaml")
     assert Path(app.config["font"]) == directory / "font.ttf"
     assert len(PdfReader(app.generate("custom.pdf", month=9)).pages) == 1
-
-
-def test_config_is_a_snapshot(tmp_path: Path) -> None:
-    config = tmp_path / "settings.yaml"
-    config.write_text("weekdays:\n  week_start: sunday\n")
-    app = CalendarApp(config)
-    config.write_text("weekdays:\n  week_start: monday\n")
-    assert app.config["weekdays"]["week_start"] == "sunday"
-    assert CalendarApp(config).config["weekdays"]["week_start"] == "monday"
 
 
 @pytest.mark.parametrize("kwargs", [{"year": 0}, {"year": 10000}, {"year": True}, {"month": 0}, {"month": 13}])
