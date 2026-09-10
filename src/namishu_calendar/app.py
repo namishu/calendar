@@ -4,7 +4,7 @@ from datetime import date
 from pathlib import Path
 
 from .config import load_config
-from .fonts import register_configured_font
+from .fonts import register_configured_font, validate_font_characters
 from .instance import MonthCalendarInstance
 from .pdf import create_canvas
 from .renderer import MonthCalendarRenderer
@@ -13,9 +13,12 @@ from .renderer import MonthCalendarRenderer
 class CalendarApp:
     """Generate calendars using a snapshot of the defaults and optional overrides."""
 
-    def __init__(self, config_path: str | Path | None = None):
-        self.config = load_config(config_path)
+    def __init__(self, config_path: str | Path | None = None, *, font_path: str | Path | None = None):
+        self.config = load_config(config_path, font_path=font_path)
         self.font_name = register_configured_font(self.config["font"])
+        validate_font_characters(
+            self.font_name, "0123456789" + "".join(self.config["header"]["months"] + self.config["weekday"]["names"])
+        )
         self.renderer = MonthCalendarRenderer(self.config, self.font_name)
 
     def generate(

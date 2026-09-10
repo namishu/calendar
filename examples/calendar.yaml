@@ -70,10 +70,11 @@ day:
   padding_left: 2
   padding_right: 2
 
-# Keep the bundled Noto Sans SC font
+# Keep the bundled Noto Sans Light font (English; no Chinese glyphs)
 font: {}
 
 # To use a custom TrueType font, replace "font: {}" above with:
 # font:
 #   path: fonts/custom.ttf
 # The path is relative to this YAML file, or it can be absolute.
+# You can also use --font PATH; it overrides font.path and resolves from the current directory.

@@ -16,3 +16,14 @@ def register_configured_font(font_config: dict) -> str:
     except Exception as exc:
         raise ValueError(f"Could not load font: {path}. Provide a readable TrueType font file.") from exc
     return name
+
+
+def validate_font_characters(font_name: str, text: str) -> None:
+    glyphs = pdfmetrics.getFont(font_name).face.charToGlyph
+    missing = sorted({char for char in text if not glyphs.get(ord(char))})
+    if missing:
+        codes = ", ".join(f"U+{ord(char):04X}" for char in missing[:8])
+        raise ValueError(
+            f"The selected font is missing characters ({codes}). "
+            "Choose a font that supports your labels with --font or font.path."
+        )

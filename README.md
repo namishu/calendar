@@ -43,8 +43,8 @@ uv tool install namishu-calendar
 python -m pip install namishu-calendar
 ```
 
-Both methods provide the `namishu-calendar` command. The default font and layout
-are included; no separate font installation is needed.
+Both methods provide the `namishu-calendar` command. The Noto Sans Light font and default
+layout are included, so English calendars need no separate font installation.
 
 ## Quick start
 
@@ -84,6 +84,7 @@ An existing PDF at the output path is replaced.
 | `--month MONTH` | Generate just this month, from 1 to 12 | All 12 months |
 | `-o, --output PATH` | PDF file location | `calendar.pdf` |
 | `--config PATH` | YAML file with layout or font overrides | Built-in settings |
+| `--font PATH` | TrueType font file; overrides `font.path` in YAML | Bundled Noto Sans Light |
 | `--help` | Show usage | |
 | `--version` | Show the installed version | |
 
@@ -122,14 +123,26 @@ edit it and pass its local path to `--config`.
 | Custom font | `font.path`: a TrueType font path, relative to the YAML file or absolute |
 
 Distances other than font sizes are in millimeters. Quote hex colors, such as
-`"#5f667e"`. Month and weekday names can be translated; the included Noto Sans SC
-font supports Simplified Chinese. Custom fonts must contain the characters you use.
-Invalid settings or an unreadable font produce an error.
+`"#5f667e"`. The bundled Noto Sans Light font supports the default English labels;
+it does not include Chinese characters. For Chinese calendars, change the month
+and weekday names in YAML and supply a font with Chinese glyphs, such as Noto Sans SC.
+
+Use `--font` to select a font file without editing your configuration:
+
+```bash
+namishu-calendar --year 2027 --month 9 --font fonts/MyFont.ttf
+```
+
+The path passed to `--font` is relative to your current directory (or absolute),
+and takes precedence over `font.path` in YAML. YAML font paths remain relative to
+the configuration file. Fonts are embedded in the PDF, so recipients do not need
+to install them. Invalid settings, unreadable fonts, or missing characters produce
+an error.
 
 ## License
 
 Code and original documentation use the [MIT License](https://github.com/namishu/calendar/blob/main/LICENSE).
-The bundled Noto Sans SC font uses the
+The bundled Noto Sans Light font uses the
 [SIL Open Font License 1.1](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/fonts/OFL.txt);
 its [notice](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/fonts/NOTICE.txt)
 records the font's attribution and source information.

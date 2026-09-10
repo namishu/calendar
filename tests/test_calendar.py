@@ -51,7 +51,7 @@ def test_partial_config_keeps_bundled_font(tmp_path: Path) -> None:
     config = tmp_path / "custom.yaml"
     config.write_text("weekday:\n  first_day: 6\n")
     app = CalendarApp(config)
-    assert Path(app.config["font"]["path"]) == DATA_DIR / "fonts/NotoSansSC-Light.ttf"
+    assert Path(app.config["font"]["path"]) == DATA_DIR / "fonts/NotoSans-Light.ttf"
     page = PdfReader(app.generate(tmp_path / "custom.pdf", year=2027, month=9)).pages[0]
     text = page.extract_text()
     assert text.index("Sunday") < text.index("Monday")
@@ -62,7 +62,7 @@ def test_partial_config_keeps_bundled_font(tmp_path: Path) -> None:
 def test_relative_custom_font(tmp_path: Path, monkeypatch) -> None:
     directory = tmp_path / "settings"
     directory.mkdir()
-    (directory / "font.ttf").symlink_to(DATA_DIR / "fonts/NotoSansSC-Light.ttf")
+    (directory / "font.ttf").symlink_to(DATA_DIR / "fonts/NotoSans-Light.ttf")
     (directory / "custom.yaml").write_text("font:\n  path: font.ttf\n")
     monkeypatch.chdir(tmp_path)
     app = CalendarApp("settings/custom.yaml")

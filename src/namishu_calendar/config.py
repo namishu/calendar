@@ -23,7 +23,7 @@ def _load_yaml(path: Path) -> dict:
     return data
 
 
-def load_config(config_path: str | Path | None = None) -> dict:
+def load_config(config_path: str | Path | None = None, *, font_path: str | Path | None = None) -> dict:
     config = _load_yaml(DATA_DIR / "main.yaml")
     config["font"]["path"] = str(DATA_DIR / config["font"]["path"])
     if config_path is not None:
@@ -38,9 +38,11 @@ def load_config(config_path: str | Path | None = None) -> dict:
                 if key not in config[section]:
                     raise ValueError(f"Unknown configuration setting: {section}.{key}")
                 config[section][key] = value
-        font_path = config["font"]["path"]
-        if isinstance(font_path, str) and font_path.strip():
-            config["font"]["path"] = str(path.parent / font_path)
+        configured_font = config["font"]["path"]
+        if isinstance(configured_font, str) and configured_font.strip():
+            config["font"]["path"] = str(path.parent / configured_font)
+    if font_path is not None:
+        config["font"]["path"] = str(Path(font_path).resolve())
     validate_calendar_config(config)
     return config
 
