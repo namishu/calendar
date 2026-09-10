@@ -28,10 +28,7 @@ Namishu Calendar 生成简洁的月历，为手写计划、日程和提醒留出
 
 需要 **Python 3.10+**。
 
-> 首个 PyPI 版本正在准备中。发布前，请在本地项目目录中运行
-> `uv tool install .` 或 `python -m pip install .` 安装。
-
-发布到 PyPI 后，可以使用 uv 或 pip 安装：
+使用 uv 或 pip 安装：
 
 ```bash
 uv tool install namishu-calendar
@@ -84,8 +81,6 @@ namishu-calendar --year 2027 --month 9 -o calendars/september.pdf
 | `--help` | 显示使用说明 | |
 | `--version` | 显示已安装的版本 | |
 
-也可以通过 `python -m namishu_calendar` 运行，使用相同的选项。
-
 ## 自定义月历
 
 只需填写想要修改的设置。例如，将以下内容保存为 `calendar.yaml`，
@@ -104,8 +99,9 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 ```
 
 未指定的设置保留默认值，包括内置字体。
-可以下载[示例配置](https://github.com/namishu/calendar/blob/main/examples/override.yaml)，
-或查阅[完整默认配置](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/main.yaml)。
+可以下载[完整示例配置](https://github.com/namishu/calendar/blob/main/examples/calendar.yaml)，
+查看所有设置及注释。该文件使用内置字体，下载后即可使用；
+按需修改后，通过 `--config` 指定其本地路径。
 
 | 设置 | 修改方式 |
 |---|---|
@@ -122,31 +118,6 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 除字号外，距离和尺寸的单位均为毫米。十六进制颜色值需加引号，例如 `"#5f667e"`。
 月份和星期名称可以改为中文；内置的 Noto Sans SC 字体支持简体中文。
 使用自定义字体时，请确保字体包含所需字符。设置无效或字体无法读取时，命令会报错。
-
-## Python 调用
-
-```python
-from namishu_calendar import CalendarApp
-
-calendar = CalendarApp()  # 也可以使用 CalendarApp("calendar.yaml")
-calendar.generate("year.pdf", year=2027)
-calendar.generate("september.pdf", year=2027, month=9)
-```
-
-`generate()` 返回输出文件的 `Path`。配置在创建实例时加载；
-修改 YAML 文件后，需要重新创建实例。
-
-## 开发
-
-在本地项目目录中运行：
-
-```bash
-uv sync
-uv run pytest
-uv run ruff check .
-uv run ruff format --check .
-uv build
-```
 
 ## 许可证
 

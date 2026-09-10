@@ -1,7 +1,0 @@
-# Override only the settings you want to change.
-# Weekday names always run Monday through Sunday; first_day changes their order.
-weekday:
-  first_day: 6
-layout:
-  margin_left: 15
-  margin_right: 15

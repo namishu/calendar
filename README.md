@@ -28,10 +28,7 @@ Print at actual size on A4 paper.
 
 Requires **Python 3.10+**.
 
-> The first PyPI release is being prepared. Until it is published, install from a
-> local checkout with `uv tool install .` or `python -m pip install .`.
-
-After the PyPI release, install with either uv or pip:
+Install with either uv or pip:
 
 ```bash
 uv tool install namishu-calendar
@@ -85,8 +82,6 @@ An existing PDF at the output path is replaced.
 | `--help` | Show usage | |
 | `--version` | Show the installed version | |
 
-You can also run the same command as `python -m namishu_calendar`.
-
 ## Customize the calendar
 
 Write only the settings you want to change. Save this as `calendar.yaml` to start
@@ -105,9 +100,9 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 ```
 
 Unspecified settings keep their defaults, including the bundled font.
-Download the [example configuration](https://github.com/namishu/calendar/blob/main/examples/override.yaml)
-or consult the [complete defaults](https://github.com/namishu/calendar/blob/main/src/namishu_calendar/data/main.yaml)
-for all settings.
+Download the [complete example configuration](https://github.com/namishu/calendar/blob/main/examples/calendar.yaml)
+for all settings and comments. It works as downloaded with the bundled font;
+edit it and pass its local path to `--config`.
 
 | Setting | How to customize it |
 |---|---|
@@ -125,31 +120,6 @@ Distances other than font sizes are in millimeters. Quote hex colors, such as
 `"#5f667e"`. Month and weekday names can be translated; the included Noto Sans SC
 font supports Simplified Chinese. Custom fonts must contain the characters you use.
 Invalid settings or an unreadable font produce an error.
-
-## Python usage
-
-```python
-from namishu_calendar import CalendarApp
-
-calendar = CalendarApp()  # Or CalendarApp("calendar.yaml")
-calendar.generate("year.pdf", year=2027)
-calendar.generate("september.pdf", year=2027, month=9)
-```
-
-`generate()` returns the output `Path`. Configuration is loaded when the app is
-created; create a new instance after editing your YAML file.
-
-## Development
-
-From a local checkout:
-
-```bash
-uv sync
-uv run pytest
-uv run ruff check .
-uv run ruff format --check .
-uv build
-```
 
 ## License
 

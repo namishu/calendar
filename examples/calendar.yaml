@@ -1,0 +1,86 @@
+# Complete calendar configuration / 完整月历配置
+# Use: namishu-calendar --year 2027 --month 9 --config calendar.yaml
+# All distances are in millimeters; font sizes are in points.
+# 距离与尺寸的单位为毫米，字号的单位为磅。
+
+# Paper and margins / 纸张与边距（默认 A4 横向）
+layout:
+  width: 297
+  height: 210
+  margin_top: 15
+  margin_bottom: 10
+  margin_left: 20
+  margin_right: 20
+
+# Month heading / 月份标题
+header:
+  # January through December; names can be translated.
+  # 按 1 月至 12 月排列，可替换为中文名称。
+  months:
+    - JANUARY
+    - FEBRUARY
+    - MARCH
+    - APRIL
+    - MAY
+    - JUNE
+    - JULY
+    - AUGUST
+    - SEPTEMBER
+    - OCTOBER
+    - NOVEMBER
+    - DECEMBER
+  size: 20
+  color: "#707a93"
+  padding_left: 0
+  padding_right: 0
+
+# Weekday heading / 星期标题
+weekday:
+  # 0 = Monday, ..., 6 = Sunday / 0 为周一，依次到 6 为周日
+  first_day: 0
+  # Always list Monday through Sunday, regardless of first_day.
+  # 始终按周一至周日排列，不随 first_day 改变。
+  names:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+  size: 16
+  color: "#5c6478"
+  padding_top: 10
+  padding_bottom: 4
+
+# Day boxes / 日期格
+cell:
+  padding: 2
+  # Empty box borders: 0 = fully visible, 1 = invisible.
+  # 空白格边框：0 为完全显示，1 为隐藏。
+  hide_empty: 0.8
+  border_radius: 1
+  border_width: 0.3
+  border_color: "#5f667e"
+
+# Day numbers / 日期数字
+day:
+  size: 16
+  color: "#1f2c50"
+  # LT / RT / LB / RB / C = top left / top right / bottom left / bottom right / center
+  # LT 左上、RT 右上、LB 左下、RB 右下、C 居中
+  align: LT
+  padding_top: 2
+  padding_bottom: 2
+  padding_left: 2
+  padding_right: 2
+
+# Keep the bundled Noto Sans SC font / 使用内置 Noto Sans SC 字体
+font: {}
+
+# To use a custom TrueType font, replace "font: {}" above with:
+# 若要使用自定义 TrueType 字体，将上面的 "font: {}" 替换为：
+# font:
+#   path: fonts/custom.ttf
+# The path is relative to this YAML file, or it can be absolute.
+# 路径相对于本 YAML 文件所在目录，也可使用绝对路径。
