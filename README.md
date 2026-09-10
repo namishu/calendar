@@ -119,7 +119,7 @@ edit it and pass its local path to `--config`.
 | Day boxes | `cell`: spacing, border width, radius, and border color |
 | Empty boxes | `cell.hide_empty`: `0` for a full border, `1` for invisible |
 | Day number position | `day.align`: `LT`, `RT`, `LB`, `RB`, or `C` for the corners or center |
-| Custom font | `font.path`: a TrueType font path, relative to the YAML file or absolute |
+| Custom font | `font`: a TrueType font path, relative to the YAML file or absolute |
 
 Distances other than font sizes are in millimeters. Quote hex colors, such as
 `"#5f667e"`. The bundled Noto Sans Light font supports the default English labels;
@@ -129,8 +129,7 @@ and weekday names in YAML and supply a font with Chinese glyphs, such as Noto Sa
 To use a custom font, add its path to your YAML configuration:
 
 ```yaml
-font:
-  path: fonts/MyFont.ttf
+font: fonts/MyFont.ttf
 ```
 
 Font paths are relative to the YAML file, or they can be absolute.

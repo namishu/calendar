@@ -58,5 +58,4 @@ day:
   padding_right: 2
 
 # Font paths in custom configurations are relative to the YAML file.
-font:
-  path: NotoSans-Light.ttf
+font: NotoSans-Light.ttf

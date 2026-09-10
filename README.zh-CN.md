@@ -117,7 +117,7 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 | 日期格 | `cell`：格间距、边框宽度、圆角半径和边框颜色 |
 | 空白格 | `cell.hide_empty`：`0` 为边框完全显示，`1` 为隐藏 |
 | 日期数字位置 | `day.align`：`LT` 左上、`RT` 右上、`LB` 左下、`RB` 右下、`C` 居中 |
-| 自定义字体 | `font.path`：TrueType 字体路径，可使用相对于 YAML 文件的路径或绝对路径 |
+| 自定义字体 | `font`：TrueType 字体路径，可使用相对于 YAML 文件的路径或绝对路径 |
 
 除字号外，距离和尺寸的单位均为毫米。十六进制颜色值需加引号，例如 `"#5f667e"`。
 内置的 Noto Sans Light 字体支持默认英文标签，不包含中文字形。
@@ -127,8 +127,7 @@ namishu-calendar --year 2027 --month 9 --config calendar.yaml
 使用自定义字体时，在 YAML 配置中添加字体路径即可：
 
 ```yaml
-font:
-  path: fonts/MyFont.ttf
+font: fonts/MyFont.ttf
 ```
 
 字体路径相对于 YAML 文件所在目录，也可以使用绝对路径。

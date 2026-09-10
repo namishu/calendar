@@ -7,8 +7,8 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 
-def register_configured_font(font_config: dict) -> str:
-    path = Path(font_config["path"])
+def register_configured_font(font_path: str | Path) -> str:
+    path = Path(font_path)
     # Distinct font paths must not overwrite each other's registration.
     name = "calendar-" + sha256(str(path).encode()).hexdigest()[:16]
     try:
@@ -25,5 +25,5 @@ def validate_font_characters(font_name: str, text: str) -> None:
         codes = ", ".join(f"U+{ord(char):04X}" for char in missing[:8])
         raise ValueError(
             f"The selected font is missing characters ({codes}). "
-            "Choose a font that supports your labels using font.path in your YAML configuration."
+            "Choose a font that supports your labels using 'font: path/to/font.ttf' in your YAML configuration."
         )

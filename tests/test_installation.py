@@ -60,8 +60,10 @@ def test_invalid_arguments(tmp_path: Path, args: tuple) -> None:
         ("day:\n  color: []", "day.color"),
         ("layout:\n  width: .nan", "layout.width"),
         ("layout:\n  margin_left: 500", "margins"),
-        ("font:\n  path: missing.ttf", "Could not load font"),
-        ("font:\n  path: null", "font.path"),
+        ("font: missing.ttf", "Could not load font"),
+        ("font: null", "Invalid font"),
+        ("font: {}", "Invalid font"),
+        ('font: ""', "Invalid font"),
         ("weekday:\n  firstday: 6", "Unknown configuration setting"),
     ],
 )
@@ -101,7 +103,7 @@ def test_yaml_custom_font_relative_to_config(tmp_path: Path) -> None:
     settings.mkdir()
     (settings / "fonts").mkdir()
     shutil.copyfile(font, settings / "fonts/custom.ttf")
-    (settings / "calendar.yaml").write_text("font:\n  path: fonts/custom.ttf\n")
+    (settings / "calendar.yaml").write_text("font: fonts/custom.ttf\n")
     result = run_cli(tmp_path, "--month", "9", "--config", "settings/calendar.yaml")
     assert result.returncode == 0, result.stderr
     page = PdfReader(tmp_path / "calendar.pdf").pages[0]
@@ -116,6 +118,6 @@ def test_chinese_labels_require_custom_font(tmp_path: Path) -> None:
     result = run_cli(tmp_path, "--config", "chinese.yaml", "--month", "9")
     assert result.returncode == 1
     assert "missing characters" in result.stderr
-    assert "font.path" in result.stderr
+    assert "font: path/to/font.ttf" in result.stderr
     assert "Traceback" not in result.stderr
     assert not (tmp_path / "calendar.pdf").exists()

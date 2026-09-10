@@ -25,22 +25,25 @@ def _load_yaml(path: Path) -> dict:
 
 def load_config(config_path: str | Path | None = None) -> dict:
     config = _load_yaml(DATA_DIR / "default.yaml")
-    config["font"]["path"] = str(DATA_DIR / config["font"]["path"])
+    config["font"] = str(DATA_DIR / config["font"])
     if config_path is not None:
         path = Path(config_path).resolve()
         overrides = _load_yaml(path)
         for section, values in overrides.items():
             if section not in config:
                 raise ValueError(f"Unknown configuration section: {section}")
+            if section == "font":
+                config["font"] = values
+                continue
             if not isinstance(values, dict):
                 raise ValueError(f"Invalid {section}: expected mapping")
             for key, value in values.items():
                 if key not in config[section]:
                     raise ValueError(f"Unknown configuration setting: {section}.{key}")
                 config[section][key] = value
-        configured_font = config["font"]["path"]
+        configured_font = config["font"]
         if isinstance(configured_font, str) and configured_font.strip():
-            config["font"]["path"] = str(path.parent / configured_font)
+            config["font"] = str(path.parent / configured_font)
     validate_calendar_config(config)
     return config
 
@@ -103,9 +106,9 @@ def validate_calendar_config(config: dict[str, Any]) -> None:
             toColor(value)
         except (ValueError, TypeError, AttributeError) as exc:
             raise ValueError(f"Invalid {section}.{key}: expected a color string") from exc
-    font_path = _section(config, "font").get("path")
+    font_path = config.get("font")
     if not isinstance(font_path, str) or not font_path.strip():
-        raise ValueError("Invalid font.path: expected a non-empty file path")
+        raise ValueError("Invalid font: expected a non-empty file path")
 
 
 def _section(config: dict[str, Any], name: str) -> dict[str, Any]:
