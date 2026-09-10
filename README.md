@@ -10,16 +10,21 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 
-Namishu Calendar creates a clean monthly calendar with space for handwritten plans,
-appointments, and reminders. Generate a full year or a single month as a PDF,
-with one month per page. The default layout uses A4 landscape paper, English month
-and weekday names, and weeks starting on Monday.
-
 <p align="center">
   <a href="https://github.com/namishu/calendar/blob/main/examples/calendar.pdf">
-    <img src="examples/calendar.png" alt="September 2027 calendar, with a Monday-first grid and space to write in each day" width="800">
+    <img src="examples/calendar.png" alt="September 2027 calendar, with a Monday-first grid and space to write in each day" width="560">
   </a>
 </p>
+
+Namishu Calendar is a small command-line tool that creates printable monthly calendars.
+Choose a year or month to get a PDF with one month per page and room to write in each day.
+Use it to put a family schedule on the fridge, display classroom activities on a noticeboard,
+or keep a study plan beside your desk.
+
+The dates and page layout are prepared for you, so you can print a fresh calendar whenever
+you need one without drawing a grid or updating an old template. The default is A4 landscape
+with English labels and weeks starting on Monday. You can also change the labels, first
+weekday, colors, and margins to suit the way you plan.
 
 [Download the sample PDF](https://github.com/namishu/calendar/raw/refs/heads/main/examples/calendar.pdf).
 Print at actual size on A4 paper.

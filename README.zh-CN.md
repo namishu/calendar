@@ -11,15 +11,19 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 
-Namishu Calendar 生成简洁的月历，为手写计划、日程和提醒留出空间。
-可以生成全年或单个月份的 PDF，每月一页。默认采用 A4 横向纸张，
-月份和星期名称为英文，每周从周一开始。
-
 <p align="center">
   <a href="https://github.com/namishu/calendar/blob/main/examples/calendar.pdf">
-    <img src="examples/calendar.png" alt="2027 年 9 月月历，每周从周一开始，每个日期格内留有书写空间" width="800">
+    <img src="examples/calendar.png" alt="2027 年 9 月月历，每周从周一开始，每个日期格内留有书写空间" width="560">
   </a>
 </p>
+
+Namishu Calendar 是一个生成可打印月历的命令行小工具。指定年份或月份，
+就能得到每月一页的 PDF，每个日期格里都留有手写空间。你可以把它贴在冰箱上，
+记录一家人的日程；放在教室公告栏里，标注班级活动；也可以摆在书桌旁，安排学习计划。
+
+它会自动排好日期和版面，省去自己画表格、核对星期或修改旧模板的工夫，
+需要时生成一份，打印出来就能用。默认版式为 A4 横向，使用英文月份和星期名称，
+每周从周一开始。你也可以按自己的习惯调整文字、每周起始日、颜色和边距。
 
 [下载示例 PDF](https://github.com/namishu/calendar/raw/refs/heads/main/examples/calendar.pdf)，
 使用 A4 纸按实际大小打印。
