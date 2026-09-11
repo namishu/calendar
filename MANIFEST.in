@@ -1,4 +1,6 @@
+include CONTRIBUTING.md
 include uv.lock README.zh-CN.md
 recursive-include tests *.py
 recursive-include examples *.yaml *.pdf *.png
 global-exclude .DS_Store *.py[cod]
+recursive-include scripts *.py
