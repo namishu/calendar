@@ -32,8 +32,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: uv sync --locked
-      - run: uv run --frozen ruff check src tests scripts
-      - run: uv run --frozen ruff format --check src tests scripts
+      - run: uv run --frozen ruff check src tests
+      - run: uv run --frozen ruff format --check src tests
       - run: uv run --frozen pytest -q
 
   build:
@@ -61,8 +61,16 @@ jobs:
           if os.environ['RELEASE_TAG'] != expected:
               raise SystemExit(f"Release tag must be {expected}")
           PY
-      - name: Build and test the installed wheel
-        run: uv run --frozen python scripts/check_release.py --dist-dir dist
+      - name: Build distributions
+        run: uv build --out-dir dist
+      - name: Check installed wheel
+        run: |
+          uv venv "$RUNNER_TEMP/wheel-check"
+          uv pip install --python "$RUNNER_TEMP/wheel-check/bin/python" dist/*.whl
+          cd "$RUNNER_TEMP"
+          ./wheel-check/bin/namishu-calendar --version
+          ./wheel-check/bin/namishu-calendar --year 2027 --month 9 --output calendar.pdf
+          test -s calendar.pdf
       - name: Validate PyPI metadata and README
         run: uvx twine check --strict dist/*
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
