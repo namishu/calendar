@@ -25,8 +25,9 @@ Namishu Calendar 是一个生成可打印月历的命令行小工具。指定年
 需要时生成一份，打印出来就能用。默认版式为 A4 横向，使用英文月份和星期名称，
 每周从周一开始。你也可以按自己的习惯调整文字、每周起始日、颜色和边距。
 
-[下载示例 PDF](https://github.com/namishu/calendar/raw/refs/heads/main/examples/calendar.pdf)，
-使用 A4 纸按实际大小打印。
+<p align="center">
+  示例 PDF 文件：<a href="examples/calendar.pdf">月历打印版</a>
+</p>
 
 ## 安装
 
@@ -73,6 +74,8 @@ namishu-calendar --year 2027 --month 9 -o calendars/september.pdf
 
 生成完成后，命令会显示文件保存位置和页数。相对路径以当前工作目录为准，
 不存在的上级目录会自动创建。如果输出路径已有 PDF 文件，会直接覆盖。
+
+使用 A4 纸按实际大小打印。
 
 ## 命令行选项
 

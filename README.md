@@ -26,8 +26,9 @@ you need one without drawing a grid or updating an old template. The default is 
 with English labels and weeks starting on Monday. You can also change the labels, first
 weekday, colors, and margins to suit the way you plan.
 
-[Download the sample PDF](https://github.com/namishu/calendar/raw/refs/heads/main/examples/calendar.pdf).
-Print at actual size on A4 paper.
+<p align="center">
+  Sample PDF: <a href="examples/calendar.pdf">Monthly calendar</a>
+</p>
 
 ## Installation
 
@@ -75,6 +76,8 @@ namishu-calendar --year 2027 --month 9 -o calendars/september.pdf
 The command prints the saved file location and page count. Relative paths are
 resolved from your current directory; parent directories are created as needed.
 An existing PDF at the output path is replaced.
+
+Print at actual size on A4 paper.
 
 ## Options
 
